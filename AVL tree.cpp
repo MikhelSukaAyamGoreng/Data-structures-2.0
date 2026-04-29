@@ -49,7 +49,7 @@ node *rotate_right(node *y) {
     get_height(y);  // y is now lower, update first
     get_height(x);  // x is now higher, update second
 
-    return x;       // x is the new root
+    return x;       // x is the new head
 }
 
 /*
@@ -69,7 +69,7 @@ node *rotate_left(node *x) {
     get_height(x);  // x is now lower, update first
     get_height(y);  // y is now higher, update second
 
-    return y;       // y is the new root
+    return y;       // y is the new head
 }
 
 // ── node creation ─────────────────────────────────────────────────────────────
@@ -159,6 +159,42 @@ void print(node *n) {
     print(n->left);
     printf("val: %d  height: %d  balance: %d\n", n->val, n->height, balance(n));
     print(n->right);
+}
+
+// Delete
+struct node* deleteNode(struct node* head, int key) {
+    // 1. Standard BST Deletion
+    if (head == NULL) return head;
+    if (key < head->key)
+        head->left = deleteNode(head->left, key);
+    else if (key > head->key)
+        head->right = deleteNode(head->right, key);
+    else {
+        // Node found
+        if ((head->left == NULL) || (head->right == NULL)) {
+            struct Node *temp = head->left ? head->left : head->right;
+            if (temp == NULL) { // No child case
+                temp = head;
+                head = NULL;
+            } else *head = *temp; // One child case
+            free(temp);
+        } else {
+            // Two children case: get inorder successor
+            struct Node* temp = minValueNode(head->right);
+            head->key = temp->key;
+            head->right = deleteNode(head->right, temp->key);
+        }
+    }
+
+    if (head == NULL) return head;
+
+    // 2. Update height and check balance
+    head->height = 1 + max(height(head->left), height(head->right));
+    int balance = getBalance(head);
+
+    // 3. Rebalance the node (LL, LR, RR, RL cases)
+    // ... rotation logic here ...
+    return head;
 }
 
 // ── main ──────────────────────────────────────────────────────────────────────
