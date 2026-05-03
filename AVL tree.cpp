@@ -149,7 +149,65 @@ void push(node **n, int val) {
         (*n)->right = rotate_right((*n)->right);
         *n = rotate_left(*n);
         return;
+
+
+
+         
     }
+}
+
+// delete
+node *delete(node *head, int target) {
+    if (head == NULL) return 0;
+    node *temp = head;
+    if (head->val > target ) {
+        head->left = delete(head->left, target);
+    }
+    else if (head->val < target) {
+        head->right = delete(head->right, target);
+    }
+    else {
+        if (head->left == NULL) {
+            head = head->right;
+            free(temp);
+            return head;
+        }
+        else if (head->right == NULL) {
+            head = head->left;
+            free(temp);
+            return head;
+        }
+        else {
+            temp = head->right;
+            while (temp->left != NULL) {
+                temp = temp->left;
+            }
+            head->val = temp->val;    
+            head->right = delete(head->right, temp->val);
+        }
+    }
+
+    int target_balance = balance(head);
+    if (target_balance < -1 && head->val > target) {
+        head = rotate_left(head);
+        return head;
+    }
+    else if (target_balance > 1 && head->val < target) {
+        head = rotate_right(head);
+        return head;
+    }
+    else if (target_balance > 1 && head->val > target) {
+        head->right = rotate_right(head);
+        head = rotate_right(head);
+        return head;
+    }
+    else if (target_balance < -1 && head->val < target) {
+        head->left = rotate_left(head);
+        head = rotate_left(head);
+        return head;
+    }
+    
+    return head;
 }
 
 // ── print in-order (should print sorted) ─────────────────────────────────────
